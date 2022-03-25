@@ -97,7 +97,7 @@ void read_c_r_e(char* comm, char* pid, char* user, char* fd)
 		memset(ftype, '\0', 10);
 
 		stat(pathname, &pstat);		
-    	get_filetype(pstat.st_mode, ftype);
+    		get_filetype(pstat.st_mode, ftype);
 		readlink(pathname, name, sizeof(name)-1);
     			
 		output_in_REX(comm, pid, user, pfd, ftype, pstat.st_ino, name, ADMITTED);
@@ -197,7 +197,7 @@ void read_fd(char* comm, char* pid, char* user)
 			lstat(pathname_in_fd, &plstat);
 			get_openmode(plstat.st_mode, modeflag);
 
-    		readlink(pathname_in_fd, name, sizeof(name)-1);
+    			readlink(pathname_in_fd, name, sizeof(name)-1);
 			sscanf(name, "%s %*s", name);
 			
 			if( flag >= 2)
