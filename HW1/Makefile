@@ -1,8 +1,19 @@
-all:
-	gcc hw1.c attr.c format_print.c filter.c -o hw1
+CC = gcc
+CFLAGS = -g -Wall -Wextra -Werror
+
+SRC = $(wildcard *.c)
+OBJS = $(patsubst %.c, %.o, $(SRC))
+
+EXE = hw1
+
+all: $(OBJS)
+	$(CC) $(OBJS) -o $(EXE)
+
+%.o: %.c
+	$(CC) -c $(CFLAGS) $< -o $@
 
 run:
-	./hw1 | head -n 20
+	./$(EXE) | head -n 20
 
 clean:
-	rm hw1
+	rm $(EXE) *.o

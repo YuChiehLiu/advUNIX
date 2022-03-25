@@ -146,13 +146,9 @@ void read_maps(char* comm, char* pid, char* user)
 				get_filetype(pstat.st_mode, ftype);
 
 				if( !strcmp(delflag, "(deleted)") )
-				{
 					output_in_REX(comm, pid, user, "DEL", ftype, atol(inode), name, ADMITTED);
-				}
 				else
-				{
 					output_in_REX(comm, pid, user, "mem", ftype, atol(inode), name, ADMITTED);
-				}
 			}
 		}
 	}
