@@ -1,1 +1,0 @@
-void output_in_REX(char* comm, char* pid, char* user, char* fd, char* type, long inode, char* name, int perflag);
