@@ -29,11 +29,14 @@ int handel_flag(int argc, char* argv[], char* envp[])
                 break;
             case 'o' :
                 check_o=1;
-                if(argv[optind][0] != '-')
-                {  
-                    check_of=1;
-                    envp[1]="O_FILE=YES";
-                    envp[2] = argv[optind];              
+                if(optind<argc)
+                {
+                    if(argv[optind][0] != '-')
+                    {  
+                        check_of=1;
+                        envp[1]="O_FILE=YES";
+                        envp[2] = argv[optind];              
+                    }
                 }
                 break;
             case '?' :
