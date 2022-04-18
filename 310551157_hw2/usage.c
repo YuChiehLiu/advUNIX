@@ -9,7 +9,6 @@
 
 char *p_flag;
 int check_p=0, check_o=0, check_of=0;
-FILE* o_fp;
 
 int handel_flag(int argc, char* argv[], char* envp[])
 {   
