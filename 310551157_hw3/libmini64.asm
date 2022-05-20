@@ -25,7 +25,6 @@ sys_%2:
         global __myrt:function
         global setjmp:function
         global longjmp:function
-        global getsigmaskset:function
 __myrt:
         mov rax, 15
         syscall
@@ -42,25 +41,28 @@ setjmp:
         mov [rdi+0x38], r15
         push rcx
         push rdi
-        call getsigmaskset
+        mov rdi, 2
+        lea rsi, [rsp-8]
+        mov QWORD [rsi], 0
+        lea rdx, [rsp-16]
+        mov rcx, 8
+        call sys_rt_sigprocmask
+        mov rax, [rsp-16]
         pop rdi
         mov [rdi+0x40], rax
         mov rax, 0
         ret
 
 longjmp:
-        push rbp
-        mov rbp, rsp
-        mov [rbp-8], rdi
-        mov [rbp-16], rsi
-        sub rsp, 24
+        push rsi
+        push rdi
         lea rsi, [rdi+0x40]
         mov rdi, 2
-        lea rdx, [rsp]
+        lea rdx, [rsp-16]
         mov rcx, 8
         call sys_rt_sigprocmask
-        mov rax, [rbp-16]
-        mov rdi, [rbp-8]
+        pop rdi
+        pop rax
         mov rcx, [rdi+0x00]
         mov rbx, [rdi+0x08]
         mov rsp, [rdi+0x10]
@@ -69,21 +71,5 @@ longjmp:
         mov r13, [rdi+0x28]
         mov r14, [rdi+0x30]
         mov r15, [rdi+0x38]
-
         jmp rcx
-
-getsigmaskset:
-        push rbp
-        mov rbp, rsp
-        mov QWORD [rbp-8], 0
-        sub rsp, 16
-        mov rdi, 0
-        lea rsi, [rbp-8]
-        lea rdx, [rbp-16]
-        mov rcx, 8
-        call sys_rt_sigprocmask
-        mov rax, [rbp-16]
-        add rsp, 16
-        pop rbp
-        ret
 
