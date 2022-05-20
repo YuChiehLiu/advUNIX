@@ -41,12 +41,14 @@ setjmp:
         mov [rdi+0x38], r15
         push rcx
         push rdi
-        mov rdi, 2
+        mov rdi, 0
         lea rsi, [rsp-8]
         mov QWORD [rsi], 0
         lea rdx, [rsp-16]
         mov rcx, 8
+        sub rsp, 16
         call sys_rt_sigprocmask
+        add rsp, 16
         mov rax, [rsp-16]
         pop rdi
         mov [rdi+0x40], rax
@@ -58,9 +60,11 @@ longjmp:
         push rdi
         lea rsi, [rdi+0x40]
         mov rdi, 2
-        lea rdx, [rsp-16]
+        lea rdx, [rsp-8]
         mov rcx, 8
+        sub rsp, 8
         call sys_rt_sigprocmask
+        add rsp, 8
         pop rdi
         pop rax
         mov rcx, [rdi+0x00]
