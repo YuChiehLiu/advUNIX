@@ -9,9 +9,12 @@ extern char path_name[100];
 extern int wait_status;
 extern int is_script;
 extern int is_file;
+extern int is_restart;
 extern Elf64_Ehdr ehdr;
 extern Elf64_Shdr strshdr;
 extern Elf64_Shdr textshdr;
+extern pid_t CHILD;
+extern char *args[2];
 
 typedef struct breakpoint_struct
 {
@@ -32,15 +35,15 @@ void c_list();
 
 
 /* not loaded*/
-pid_t c_load(char *path, char *argv[]);
+void c_load();
 
 /* loaded */
-void c_start(pid_t child);
+void c_start();
 
 /* running*/
-void c_si(pid_t child);
-void c_run(pid_t child);
+void c_run();
 void c_cont(pid_t child);
+void c_si(pid_t child);
 int c_vmmap(pid_t child);
 void c_getregs(pid_t child);
 void c_getreg(pid_t child, char *reg_name);

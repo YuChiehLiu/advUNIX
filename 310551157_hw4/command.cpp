@@ -35,12 +35,19 @@ void sdb(pid_t child, char *comm)
         c_help();
     else if(!strcmp(comm, "list") || !strcmp(comm, "l"))
         c_list();
+    else if(state==NOT_LOADED)
+    {
+        if((strstr(comm, "load")!=NULL))
+            c_load();
+        else
+            fprintf(stderr, "** Command not found or can not be used in this state.\n");  
+    }
     else if(state==LOADED)
     {
         if(!strcmp(comm, "start"))
-            c_start(child);
+            c_start();
         else if(!strcmp(comm, "run") || !strcmp(comm, "r"))
-            c_run(child);
+            c_run();
         else
             fprintf(stderr, "** Command not found or can not be used in this state.\n");
     }
@@ -49,7 +56,7 @@ void sdb(pid_t child, char *comm)
         if(!strcmp(comm, "cont") || !strcmp(comm, "c"))
             c_cont(child);
         else if(!strcmp(comm, "run") || !strcmp(comm, "r"))
-            c_run(child);
+            c_run();
         else if(!strcmp(comm, "si"))
             c_si(child);
         else if(!strcmp(comm, "vmmap") || !strcmp(comm, "m"))
@@ -189,29 +196,43 @@ void c_list()
     }
 }
 
-pid_t c_load(char *path, char *argv[])
+void c_load()
 {
-    pid_t child;
-    
-    if((child = fork()) < 0) errquit("fork");
-
     state = LOADED;
-    
-    if(child==0)
+    if(!is_restart)
+        fprintf(stderr, "** program '%s' loaded. entry point %#lx\n", path_name, textshdr.sh_addr);
+}
+
+void c_start()
+{
+    if((CHILD = fork()) < 0) errquit("fork");
+        
+    if(CHILD==0)
     {                
         if(ptrace(PTRACE_TRACEME, 0, 0, 0)) errquit("ptrace");
-        execv(path, argv);
+        execv(path_name, args);
         errquit("execv");
     }
 
-
-    return child;
+    if(waitpid(CHILD, &wait_status, 0) < 0) errquit("waitpid");
+    assert(WIFSTOPPED(wait_status));
+    ptrace(PTRACE_SETOPTIONS, CHILD, 0, PTRACE_O_EXITKILL);
+    
+    if(is_restart) reset_bp(CHILD);
+    
+    fprintf(stderr, "** pid %d\n", CHILD);
+        
+    state = RUNNING;
 }
 
-void c_start(pid_t child)
+void c_run()
 {
-    fprintf(stderr, "** pid %d\n", child);
-    state = RUNNING;
+    if(state == RUNNING)
+        fprintf(stderr, "** program sample/hello64 is already running\n");
+    else
+        c_start();
+
+    c_cont(CHILD);
 }
 
 void c_cont(pid_t child)
@@ -267,16 +288,6 @@ void c_cont(pid_t child)
     }
 
 
-}
-
-void c_run(pid_t child)
-{
-    if(state == RUNNING)
-        fprintf(stderr, "** program sample/hello64 is already running\n");
-    else
-        c_start(child);
-
-    c_cont(child);
 }
 
 void c_si(pid_t child)
