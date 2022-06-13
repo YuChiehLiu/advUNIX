@@ -1,3 +1,4 @@
+#include <climits>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -49,7 +50,10 @@ int load_maps(pid_t pid, map<range_t, map_entry_t>& loaded)
 		if(args[1][1] == 'w') m.perm |= 0x02;
 		if(args[1][2] == 'x') m.perm |= 0x01;
 		m.offset = strtol(args[2], NULL, 16);
-		fprintf(stderr, "%016lx-%016lx %c%c%c %lx\t%s\n", m.range.begin, m.range.end,args[1][0], args[1][1], args[1][2], m.offset, m.name.c_str());
+		if(m.range.begin == LONG_MAX)
+			fprintf(stderr, "%s-%s %c%c%c %lx\t%s\n", args[0], ptr+1, args[1][0], args[1][1], args[1][2], m.offset, m.name.c_str());
+		else
+			fprintf(stderr, "%016lx-%016lx %c%c%c %lx\t%s\n", m.range.begin, m.range.end, args[1][0], args[1][1], args[1][2], m.offset, m.name.c_str());
 		loaded[m.range] = m;
 	}
 	return (int) loaded.size();
